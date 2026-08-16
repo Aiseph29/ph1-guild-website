@@ -41,7 +41,7 @@ async function loadDiscordAnnouncements() {
 
         const response =
             await fetch(
-                "http://localhost:3000/api/announcements"
+                "https://ph1-discord-api.onrender.com/api/announcements"
             );
 
 
