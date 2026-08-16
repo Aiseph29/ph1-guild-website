@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>PH1 Guild — Ragnarok: The New World</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+
+  <!-- Background Effects -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <header class="topbar">
+
+    <div class="brand">
+
+      <img
+        src="images/bg.png"
+        alt="PH1 Guild Logo"
+        class="guild-logo"
+      >
+
+      <div class="brand-text">
+
+        <strong>PH1 GUILD</strong>
+
+        <span>
+          Ragnarok: The New World
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <nav>
+
+      <a href="#home">Home</a>
+
+      <a href="#announcements">
+        Announcements
+      </a>
+
+      <a href="#attendance">
+        Attendance
+      </a>
+
+      <a href="#members">
+        Members
+      </a>
+
+      <a href="#rules">
+        Rules
+      </a>
+
+    </nav>
+
+  </header>
+
+
+
+  <main>
+    <section
+      id="home"
+      class="hero"
+    >
+
+      <div class="hero-copy">
+
+        <p class="eyebrow">
+          🇵🇭 PHILIPPINE GUILD
+        </p>
+
+
+        <h1>
+          Welcome to <span>PH1</span>
+        </h1>
+
+
+        <p class="lead">
+          One guild. One family. One goal —
+          dominate the New World together.
+        </p>
+
+
+        <div class="hero-buttons">
+
+          <a
+            class="btn primary"
+            href="#announcements"
+          >
+            View Announcements
+          </a>
+
+
+          <a
+            class="btn ghost"
+            href="#attendance"
+          >
+            Guild Attendance
+          </a>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="hero-card">
+
+        <div class="crest">
+          ⚔️
+        </div>
+
+
+        <h2>
+          PH1
+        </h2>
+
+
+        <p>
+          Ragnarok: The New World
+        </p>
+
+
+        <div class="guild-roster">
+
+  <div class="roster-header">
+    <span>PH1 GUILD MEMBERS</span>
+    <span id="memberCount">0</span>
+  </div>
+
+  <div id="heroMemberList" class="hero-member-list">
+
+    <div class="member-loading">
+      Loading members...
+    </div>
+
+  </div>
+
+</div>
+
+      </div>
+
+    </section>
+
+    <section
+    id="announcements"
+    class="section"
+>
+
+    <div class="section-head">
+
+        <div>
+
+            <p class="eyebrow">
+                GUILD NEWS
+            </p>
+
+            <h2>
+                Announcements
+            </h2>
+
+        </div>
+
+        <div class="discord-live">
+
+            <span class="discord-dot"></span>
+
+            LIVE FROM DISCORD
+
+        </div>
+
+    </div>
+
+
+    <div class="announcement-carousel">
+
+        <button
+            class="announcement-arrow announcement-prev"
+            onclick="previousAnnouncement()"
+            aria-label="Previous announcement"
+        >
+            ‹
+        </button>
+
+
+        <div
+            id="announcementList"
+            class="announcement-display"
+        ></div>
+
+
+        <button
+            class="announcement-arrow announcement-next"
+            onclick="nextAnnouncement()"
+            aria-label="Next announcement"
+        >
+            ›
+        </button>
+
+    </div>
+
+
+    <div
+        id="announcementDots"
+        class="announcement-dots"
+    ></div>
+
+</section>
+
+    <section
+      id="attendance"
+      class="section"
+    >
+
+      <div class="section-head">
+
+        <div>
+
+          <p class="eyebrow">
+            GUILD MANAGEMENT
+          </p>
+
+          <h2>
+            Daily Attendance & Gear Rating
+          </h2>
+
+        </div>
+
+      </div>
+
+      <!-- Attendance Information -->
+
+      <div class="attendance-container">
+
+        <div class="attendance-toolbar">
+
+          <div>
+
+            <strong>
+              📊 PH1 Guild Attendance
+            </strong>
+
+            <span>
+              Daily attendance and gear rating
+            </span>
+
+          </div>
+
+
+          <a
+            href="https://docs.google.com/spreadsheets/d/1qWbAc86k3ogVYZeF5mb7rLKSy41MN6o_MTmYHEL6Hr8/edit"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn small ghost"
+          >
+            Open Google Sheet
+          </a>
+
+        </div>
+
+
+        <!-- Google Spreadsheet -->
+
+        <div class="spreadsheet-wrapper">
+
+          <iframe
+            src="https://docs.google.com/spreadsheets/d/1qWbAc86k3ogVYZeF5mb7rLKSy41MN6o_MTmYHEL6Hr8/edit?usp=sharing"
+            class="spreadsheet"
+            title="PH1 Guild Attendance"
+          >
+          </iframe>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- Attendance Notes -->
+
+      <div class="panel attendance-notes">
+
+        <h3>
+          Quick Attendance Notes
+        </h3>
+
+
+        <textarea
+          id="attendanceNotes"
+          placeholder="Example: War attendance starts at 8:00 PM. Please be online 15 minutes early."
+        ></textarea>
+
+
+        <button
+          class="btn primary"
+          onclick="saveNotes()"
+        >
+          Save Notes
+        </button>
+
+
+        <span
+          id="savedMessage"
+        ></span>
+
+      </div>
+
+    </section>
+
+    
+
+    <section
+      id="rules"
+      class="section"
+    >
+
+      <div class="section-head">
+
+        <div>
+
+          <p class="eyebrow">
+            READ BEFORE PLAYING
+          </p>
+
+          <h2>
+            Guild Rules
+          </h2>
+
+        </div>
+
+      </div>
+
+      <div class="rules-grid">
+
+        <article>
+
+          <span>
+            01
+          </span>
+
+          <h3>
+            Respect
+          </h3>
+
+          <p>
+            Respect guildmates and other players.
+            No unnecessary drama.
+          </p>
+
+        </article>
+
+
+        <article>
+
+          <span>
+            02
+          </span>
+
+          <h3>
+            Attendance
+          </h3>
+
+          <p>
+            Be present for important guild events
+            when you are available.
+          </p>
+
+        </article>
+
+
+        <article>
+
+          <span>
+            03
+          </span>
+
+          <h3>
+            Teamwork
+          </h3>
+
+          <p>
+            Help the guild grow. Share information,
+            strategies and resources.
+          </p>
+
+        </article>
+
+        <article>
+
+          <span>
+            04
+          </span>
+
+          <h3>
+            Activity
+          </h3>
+
+          <p>
+            Stay active and inform officers if you
+            need an extended break.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+
+    <strong>
+      PH1 GUILD
+    </strong>
+
+    • Ragnarok: The New World
+
+    <span>
+      © 2026
+    </span>
+
+  </footer>
+
+  <div
+    id="modal"
+    class="modal"
+  >
+
+    <div class="modal-box">
+
+      <button
+        class="close"
+        onclick="closeModal()"
+      >
+        ×
+      </button>
+
+
+      <h2 id="modalTitle">
+        Add Announcement
+      </h2>
+
+
+      <form
+        id="modalForm"
+        onsubmit="submitModal(event)"
+      >
+
+        <div id="formFields"></div>
+
+
+        <button
+          class="btn primary"
+          type="submit"
+        >
+          Save
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+  <script src="script.js"></script>
+
+</body>
+
+</html>
