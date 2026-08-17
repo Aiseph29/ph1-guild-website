@@ -1,17 +1,7 @@
-const MEMBER_SHEET_ID =
-    "14ygF1s48Yf6z2dRzf-K--L1DfqNzudIteJlsbpIfdvo";
-
-const MEMBER_SHEET_GID =
-    "1347299641";
-
-const HERO_SHEET_ID =
-    "1qmfkY1hoCYdslDwmQhPGsxyc0JnV006x7lBcFafTPrQ";
-
-const HERO_SHEET_GID =
-    "804908968";
+const MEMBER_SHEET_ID = "14ygF1s48Yf6z2dRzf-K--L1DfqNzudIteJlsbpIfdvo";
+const MEMBER_SHEET_GID = "1347299641";
 
 let members = [];
-let heroMembers = [];
 let announcements = [];
 let currentAnnouncement = 0;
 
@@ -33,20 +23,12 @@ async function loadDiscordAnnouncements() {
         renderAnnouncement();
         updateAnnouncementCounters();
 
-        console.log(
-            `Loaded ${announcements.length} Discord announcements.`
-        );
+        console.log(`Loaded ${announcements.length} Discord announcements.`);
     } catch (error) {
-        console.error(
-            "Failed to load Discord announcements:",
-            error
-        );
+        console.error("Failed to load Discord announcements:", error);
 
-        const announcementList =
-            document.getElementById("announcementList");
-
-        const announcementDots =
-            document.getElementById("announcementDots");
+        const announcementList = document.getElementById("announcementList");
+        const announcementDots = document.getElementById("announcementDots");
 
         if (announcementList) {
             announcementList.innerHTML = `
@@ -65,25 +47,18 @@ async function loadDiscordAnnouncements() {
 }
 
 function renderAnnouncement() {
-    const display =
-        document.getElementById("announcementList");
+    const display = document.getElementById("announcementList");
 
     if (!display) return;
 
-    const latest =
-        announcements.slice(0, 3);
+    const latest = announcements.slice(0, 3);
 
     if (!latest.length) {
         display.innerHTML = `
             <article class="announcement-featured">
                 <div class="announcement-top">
-                    <span class="announcement-label">
-                        GUILD NEWS
-                    </span>
-
-                    <span class="announcement-date">
-                        NO ANNOUNCEMENTS
-                    </span>
+                    <span class="announcement-label">GUILD NEWS</span>
+                    <span class="announcement-date">NO ANNOUNCEMENTS</span>
                 </div>
 
                 <h3>No announcements yet</h3>
@@ -105,84 +80,61 @@ function renderAnnouncement() {
         currentAnnouncement = latest.length - 1;
     }
 
-    const announcement =
-        latest[currentAnnouncement];
+    const announcement = latest[currentAnnouncement];
 
     let date = "";
 
     if (announcement.timestamp) {
-        const parsedDate =
-            new Date(announcement.timestamp);
+        const parsedDate = new Date(announcement.timestamp);
 
         if (!isNaN(parsedDate.getTime())) {
-            date =
-                parsedDate.toLocaleDateString(
-                    "en-US",
-                    {
-                        month: "2-digit",
-                        day: "2-digit",
-                        year: "numeric"
-                    }
-                );
+            date = parsedDate.toLocaleDateString("en-US", {
+                month: "2-digit",
+                day: "2-digit",
+                year: "numeric"
+            });
         }
     }
 
     if (!date) {
-        date =
-            announcement.date || "";
+        date = announcement.date || "";
     }
 
-    let message =
-        announcement.text || "";
+    let message = announcement.text || "";
 
-    message =
-        message
-            .replace(/\s+/g, " ")
-            .trim();
+    message = message.replace(/\s+/g, " ").trim();
 
     if (message.length > 220) {
-        message =
-            message.substring(0, 220) + "...";
+        message = message.substring(0, 220) + "...";
     }
 
-    const title =
-        announcement.title ||
-        "PH1 Guild Announcement";
+    const title = announcement.title || "PH1 Guild Announcement";
+    const author = announcement.author || "PH1 Guild";
 
-    const author =
-        announcement.author ||
-        "PH1 Guild";
+    const discordLink = announcement.url
+        ? `
+            <a
+                href="${esc(announcement.url)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="discord-link"
+            >
+                VIEW ON DISCORD →
+            </a>
+        `
+        : "";
 
-    const discordLink =
-        announcement.url
-            ? `
-                <a
-                    href="${esc(announcement.url)}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="discord-link"
-                >
-                    VIEW ON DISCORD →
-                </a>
+    const dots = latest
+        .map(
+            (_, index) => `
+                <button
+                    class="announcement-dot ${index === currentAnnouncement ? "active" : ""}"
+                    onclick="showAnnouncement(${index})"
+                    aria-label="Announcement ${index + 1}"
+                ></button>
             `
-            : "";
-
-    const dots =
-        latest
-            .map(
-                (_, index) => `
-                    <button
-                        class="announcement-dot ${
-                            index === currentAnnouncement
-                                ? "active"
-                                : ""
-                        }"
-                        onclick="showAnnouncement(${index})"
-                        aria-label="Announcement ${index + 1}"
-                    ></button>
-                `
-            )
-            .join("");
+        )
+        .join("");
 
     display.innerHTML = `
         <div class="announcement-carousel">
@@ -224,10 +176,7 @@ function renderAnnouncement() {
                     </div>
                 </article>
 
-                <div
-                    class="announcement-dots"
-                    id="announcementDots"
-                >
+                <div class="announcement-dots" id="announcementDots">
                     ${dots}
                 </div>
             </div>
@@ -245,41 +194,30 @@ function renderAnnouncement() {
 }
 
 function showAnnouncement(index) {
-    const total =
-        Math.min(announcements.length, 3);
+    const total = Math.min(announcements.length, 3);
 
-    if (
-        !total ||
-        index < 0 ||
-        index >= total
-    ) {
-        return;
-    }
+    if (!total || index < 0 || index >= total) return;
 
     currentAnnouncement = index;
-
     renderAnnouncement();
 }
 
 function previousAnnouncement() {
-    const total =
-        Math.min(announcements.length, 3);
+    const total = Math.min(announcements.length, 3);
 
     if (!total) return;
 
     currentAnnouncement--;
 
     if (currentAnnouncement < 0) {
-        currentAnnouncement =
-            total - 1;
+        currentAnnouncement = total - 1;
     }
 
     renderAnnouncement();
 }
 
 function nextAnnouncement() {
-    const total =
-        Math.min(announcements.length, 3);
+    const total = Math.min(announcements.length, 3);
 
     if (!total) return;
 
@@ -293,33 +231,21 @@ function nextAnnouncement() {
 }
 
 function updateAnnouncementCounters() {
-    const announcementCount =
-        document.getElementById(
-            "announcementCount"
-        );
+    const announcementCount = document.getElementById("announcementCount");
 
     if (announcementCount) {
-        announcementCount.textContent =
-            announcements.length;
+        announcementCount.textContent = announcements.length;
     }
 
-    const eventCount =
-        document.getElementById(
-            "eventCount"
-        );
+    const eventCount = document.getElementById("eventCount");
 
     if (eventCount) {
-        eventCount.textContent =
-            announcements.filter(
-                announcement =>
-                    /event|war|gvg|raid/i.test(
-                        `${
-                            announcement.title || ""
-                        } ${
-                            announcement.text || ""
-                        }`
-                    )
-            ).length;
+        eventCount.textContent = announcements.filter(
+            announcement =>
+                /event|war|gvg|raid/i.test(
+                    `${announcement.title || ""} ${announcement.text || ""}`
+                )
+        ).length;
     }
 }
 
@@ -328,12 +254,9 @@ async function loadMembers() {
         `https://docs.google.com/spreadsheets/d/${MEMBER_SHEET_ID}/export?format=csv&gid=${MEMBER_SHEET_GID}`;
 
     try {
-        console.log(
-            "Loading PH1 guild members..."
-        );
+        console.log("Loading PH1 guild members...");
 
-        const response =
-            await fetch(url);
+        const response = await fetch(url);
 
         if (!response.ok) {
             throw new Error(
@@ -341,22 +264,15 @@ async function loadMembers() {
             );
         }
 
-        const csv =
-            await response.text();
+        const csv = await response.text();
 
-        members =
-            parseMemberCSV(csv);
+        members = parseCSV(csv);
 
-        console.log(
-            `Loaded ${members.length} guild members.`
-        );
+        console.log(`Loaded ${members.length} guild members.`);
 
         renderMembers();
     } catch (error) {
-        console.error(
-            "Failed to load PH1 guild members:",
-            error
-        );
+        console.error("Failed to load PH1 guild members:", error);
 
         members = [];
 
@@ -364,83 +280,68 @@ async function loadMembers() {
     }
 }
 
-async function loadHeroMembers() {
-    const url =
-        `https://docs.google.com/spreadsheets/d/${HERO_SHEET_ID}/export?format=csv&gid=${HERO_SHEET_GID}`;
+function parseCSV(csv) {
+    const rows = [];
+    let row = [];
+    let value = "";
+    let insideQuotes = false;
 
-    try {
-        console.log(
-            "Loading PH1 gear rating progress..."
-        );
+    for (let i = 0; i < csv.length; i++) {
+        const char = csv[i];
 
-        const response =
-            await fetch(url);
+        if (char === '"') {
+            if (insideQuotes && csv[i + 1] === '"') {
+                value += '"';
+                i++;
+            } else {
+                insideQuotes = !insideQuotes;
+            }
+        } else if (char === "," && !insideQuotes) {
+            row.push(value.trim());
+            value = "";
+        } else if (
+            (char === "\n" || char === "\r") &&
+            !insideQuotes
+        ) {
+            if (value !== "" || row.length > 0) {
+                row.push(value.trim());
+                rows.push(row);
 
-        if (!response.ok) {
-            throw new Error(
-                `Gear sheet returned HTTP ${response.status}`
-            );
+                row = [];
+                value = "";
+            }
+
+            if (char === "\r" && csv[i + 1] === "\n") {
+                i++;
+            }
+        } else {
+            value += char;
         }
-
-        const csv =
-            await response.text();
-
-        heroMembers =
-            parseHeroCSV(csv);
-
-        console.log(
-            `Loaded ${heroMembers.length} hero members.`
-        );
-
-        renderHeroMembers();
-    } catch (error) {
-        console.error(
-            "Failed to load PH1 gear rating progress:",
-            error
-        );
-
-        heroMembers = [];
-
-        showHeroMemberError();
     }
-}
 
-function parseMemberCSV(csv) {
-    const rows =
-        parseCSVRows(csv);
+    if (value !== "" || row.length > 0) {
+        row.push(value.trim());
+        rows.push(row);
+    }
 
     let headerRowIndex = -1;
     let ignIndex = -1;
     let classIndex = -1;
 
-    for (
-        let i = 0;
-        i < rows.length;
-        i++
-    ) {
-        const headers =
-            rows[i].map(header =>
-                header
-                    .trim()
-                    .toLowerCase()
-            );
+    for (let i = 0; i < rows.length; i++) {
+        const headers = rows[i].map(header =>
+            header.trim().toLowerCase()
+        );
 
-        const foundIgn =
-            headers.findIndex(
-                header =>
-                    header === "ign"
-            );
+        const foundIgn = headers.findIndex(
+            header => header === "ign"
+        );
 
-        const foundClass =
-            headers.findIndex(
-                header =>
-                    header === "class"
-            );
+        const foundClass = headers.findIndex(
+            header => header === "class"
+        );
 
-        if (
-            foundIgn !== -1 &&
-            foundClass !== -1
-        ) {
+        if (foundIgn !== -1 && foundClass !== -1) {
             headerRowIndex = i;
             ignIndex = foundIgn;
             classIndex = foundClass;
@@ -448,26 +349,25 @@ function parseMemberCSV(csv) {
         }
     }
 
-    if (headerRowIndex === -1) {
-        console.error(
-            "Could not find IGN + CLASS headers."
-        );
+    console.log("PH1 header row:", headerRowIndex);
+    console.log("IGN column:", ignIndex);
+    console.log("CLASS column:", classIndex);
 
+    if (headerRowIndex === -1) {
+        console.error("Could not find IGN + CLASS headers.");
         return [];
     }
 
     return rows
         .slice(headerRowIndex + 1)
         .map(row => {
-            const name =
-                row[ignIndex]
-                    ? row[ignIndex].trim()
-                    : "";
+            const name = row[ignIndex]
+                ? row[ignIndex].trim()
+                : "";
 
-            const rank =
-                row[classIndex]
-                    ? row[classIndex].trim()
-                    : "";
+            const rank = row[classIndex]
+                ? row[classIndex].trim()
+                : "";
 
             return {
                 name,
@@ -476,369 +376,103 @@ function parseMemberCSV(csv) {
             };
         })
         .filter(member => {
-            if (!member.name) {
+            if (!member.name) return false;
+
+            if (member.name.toUpperCase() === "TOTAL") {
                 return false;
             }
 
-            return (
-                member.name
-                    .toUpperCase() !==
-                "TOTAL"
-            );
+            return true;
         });
-}
-
-function parseHeroCSV(csv) {
-    const rows =
-        parseCSVRows(csv);
-
-    if (!rows.length) {
-        return [];
-    }
-
-    let headerRowIndex = -1;
-    let timestampIndex = -1;
-    let ignIndex = -1;
-    let gearIndex = -1;
-    let dateIndex = -1;
-    let classIndex = -1;
-
-    for (
-        let i = 0;
-        i < rows.length;
-        i++
-    ) {
-        const headers =
-            rows[i].map(header =>
-                header
-                    .trim()
-                    .toLowerCase()
-            );
-
-        const foundTimestamp =
-            headers.findIndex(
-                header =>
-                    header ===
-                    "timestamp"
-            );
-
-        const foundIgn =
-            headers.findIndex(
-                header =>
-                    header === "ign"
-            );
-
-        const foundGear =
-            headers.findIndex(
-                header =>
-                    header ===
-                    "gear rating"
-            );
-
-        const foundDate =
-            headers.findIndex(
-                header =>
-                    header === "date"
-            );
-
-        const foundClass =
-            headers.findIndex(
-                header =>
-                    header === "class"
-            );
-
-        if (
-            foundIgn !== -1 &&
-            foundGear !== -1 &&
-            foundClass !== -1
-        ) {
-            headerRowIndex = i;
-            timestampIndex =
-                foundTimestamp;
-            ignIndex = foundIgn;
-            gearIndex = foundGear;
-            dateIndex = foundDate;
-            classIndex = foundClass;
-            break;
-        }
-    }
-
-    if (headerRowIndex === -1) {
-        console.error(
-            "Could not find IGN, GEAR RATING and CLASS headers."
-        );
-
-        return [];
-    }
-
-    const latestMembers =
-        new Map();
-
-    rows
-        .slice(headerRowIndex + 1)
-        .forEach(row => {
-            const name =
-                row[ignIndex]
-                    ? row[ignIndex].trim()
-                    : "";
-
-            if (!name) {
-                return;
-            }
-
-            if (
-                name.toUpperCase() ===
-                "TOTAL"
-            ) {
-                return;
-            }
-
-            const timestamp =
-                timestampIndex !== -1
-                    ? row[timestampIndex]
-                    : "";
-
-            const gearRating =
-                row[gearIndex]
-                    ? row[gearIndex].trim()
-                    : "";
-
-            const date =
-                dateIndex !== -1 &&
-                row[dateIndex]
-                    ? row[dateIndex].trim()
-                    : "";
-
-            const rank =
-                row[classIndex]
-                    ? row[classIndex].trim()
-                    : "";
-
-            const existing =
-                latestMembers.get(
-                    name.toLowerCase()
-                );
-
-            if (!existing) {
-                latestMembers.set(
-                    name.toLowerCase(),
-                    {
-                        name,
-                        gearRating,
-                        rank,
-                        date,
-                        timestamp
-                    }
-                );
-
-                return;
-            }
-
-            const newTime =
-                new Date(timestamp)
-                    .getTime();
-
-            const oldTime =
-                new Date(
-                    existing.timestamp
-                ).getTime();
-
-            if (
-                !isNaN(newTime) &&
-                (
-                    isNaN(oldTime) ||
-                    newTime > oldTime
-                )
-            ) {
-                latestMembers.set(
-                    name.toLowerCase(),
-                    {
-                        name,
-                        gearRating,
-                        rank,
-                        date,
-                        timestamp
-                    }
-                );
-            }
-        });
-
-    return [
-        ...latestMembers.values()
-    ];
-}
-
-function parseCSVRows(csv) {
-    const rows = [];
-    let row = [];
-    let value = "";
-    let insideQuotes = false;
-
-    for (
-        let i = 0;
-        i < csv.length;
-        i++
-    ) {
-        const char = csv[i];
-
-        if (char === '"') {
-            if (
-                insideQuotes &&
-                csv[i + 1] === '"'
-            ) {
-                value += '"';
-                i++;
-            } else {
-                insideQuotes =
-                    !insideQuotes;
-            }
-        } else if (
-            char === "," &&
-            !insideQuotes
-        ) {
-            row.push(value.trim());
-            value = "";
-        } else if (
-            (
-                char === "\n" ||
-                char === "\r"
-            ) &&
-            !insideQuotes
-        ) {
-            if (
-                value !== "" ||
-                row.length > 0
-            ) {
-                row.push(value.trim());
-                rows.push(row);
-
-                row = [];
-                value = "";
-            }
-
-            if (
-                char === "\r" &&
-                csv[i + 1] === "\n"
-            ) {
-                i++;
-            }
-        } else {
-            value += char;
-        }
-    }
-
-    if (
-        value !== "" ||
-        row.length > 0
-    ) {
-        row.push(value.trim());
-        rows.push(row);
-    }
-
-    return rows;
-}
-
-function renderHeroMembers() {
-    const heroMemberList =
-        document.getElementById(
-            "heroMemberList"
-        );
-
-    if (!heroMemberList) {
-        return;
-    }
-
-    if (!heroMembers.length) {
-        heroMemberList.innerHTML = `
-            <div class="member-loading">
-                No gear rating data found.
-            </div>
-        `;
-
-        return;
-    }
-
-    heroMemberList.innerHTML =
-        heroMembers
-            .map(
-                member => `
-                    <div class="hero-member-row">
-                        <span class="hero-member-name">
-                            ${esc(member.name)}
-                        </span>
-
-                        <span class="hero-member-class">
-                            ${esc(member.rank)}
-                        </span>
-
-                        <span class="hero-member-gear">
-                            ${esc(member.gearRating)}
-                        </span>
-                    </div>
-                `
-            )
-            .join("");
 }
 
 function renderMembers() {
-    const memberList =
-        document.getElementById(
-            "memberList"
-        );
+    const heroMemberList =
+        document.getElementById("heroMemberList");
 
-    if (!memberList) {
-        return;
-    }
-
-    if (!members.length) {
-        memberList.innerHTML = `
-            <div class="member-loading">
-                No guild members found.
-            </div>
-        `;
-
-        return;
-    }
-
-    memberList.innerHTML =
-        members
-            .map(
-                member => `
-                    <article class="member">
-                        <div class="avatar">
-                            ${esc(member.icon)}
-                        </div>
-
-                        <div>
-                            <h3>
+    if (heroMemberList) {
+        if (!members.length) {
+            heroMemberList.innerHTML = `
+                <div class="member-loading">
+                    No members found.
+                </div>
+            `;
+        } else {
+            heroMemberList.innerHTML = members
+                .map(
+                    member => `
+                        <div class="hero-member-row">
+                            <span class="hero-member-name">
                                 ${esc(member.name)}
-                            </h3>
+                            </span>
 
-                            <div class="rank">
+                            <span class="hero-member-class">
                                 ${esc(member.rank)}
-                            </div>
+                            </span>
                         </div>
-                    </article>
-                `
-            )
-            .join("");
+                    `
+                )
+                .join("");
+        }
+    }
+
+    const memberList =
+        document.getElementById("memberList");
+
+    if (memberList) {
+        if (!members.length) {
+            memberList.innerHTML = `
+                <div class="member-loading">
+                    No guild members found.
+                </div>
+            `;
+        } else {
+            memberList.innerHTML = members
+                .map(
+                    member => `
+                        <article class="member">
+                            <div class="avatar">
+                                ${esc(member.icon)}
+                            </div>
+
+                            <div>
+                                <h3>
+                                    ${esc(member.name)}
+                                </h3>
+
+                                <div class="rank">
+                                    ${esc(member.rank)}
+                                </div>
+                            </div>
+                        </article>
+                    `
+                )
+                .join("");
+        }
+    }
 
     const memberCount =
-        document.getElementById(
-            "memberCount"
-        );
+        document.getElementById("memberCount");
 
     if (memberCount) {
-        memberCount.textContent =
-            members.length;
+        memberCount.textContent = members.length;
     }
 }
 
 function showMemberError() {
+    const heroMemberList =
+        document.getElementById("heroMemberList");
+
+    if (heroMemberList) {
+        heroMemberList.innerHTML = `
+            <div class="member-loading">
+                Unable to load guild members.
+            </div>
+        `;
+    }
+
     const memberList =
-        document.getElementById(
-            "memberList"
-        );
+        document.getElementById("memberList");
 
     if (memberList) {
         memberList.innerHTML = `
@@ -849,28 +483,10 @@ function showMemberError() {
     }
 
     const memberCount =
-        document.getElementById(
-            "memberCount"
-        );
+        document.getElementById("memberCount");
 
     if (memberCount) {
-        memberCount.textContent =
-            "0";
-    }
-}
-
-function showHeroMemberError() {
-    const heroMemberList =
-        document.getElementById(
-            "heroMemberList"
-        );
-
-    if (heroMemberList) {
-        heroMemberList.innerHTML = `
-            <div class="member-loading">
-                Unable to load gear rating data.
-            </div>
-        `;
+        memberCount.textContent = "0";
     }
 }
 
@@ -879,50 +495,39 @@ function render() {
     updateAnnouncementCounters();
 
     const attendanceNotes =
-        document.getElementById(
-            "attendanceNotes"
-        );
+        document.getElementById("attendanceNotes");
 
     if (attendanceNotes) {
         attendanceNotes.value =
-            localStorage.getItem(
-                "ph1_notes"
-            ) || "";
+            localStorage.getItem("ph1_notes") || "";
     }
 }
 
 function esc(s) {
     return String(s ?? "").replace(
         /[&<>"']/g,
-        c =>
-            ({
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;"
-            })[c]
+        c => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        }[c])
     );
 }
 
 function openAnnouncementModal() {
-    modalType =
-        "announcement";
+    modalType = "announcement";
 
     const modalTitle =
-        document.getElementById(
-            "modalTitle"
-        );
+        document.getElementById("modalTitle");
 
     if (modalTitle) {
-        modalTitle.textContent =
-            "Add Announcement";
+        modalTitle.textContent = "Add Announcement";
     }
 
     const formFields =
-        document.getElementById(
-            "formFields"
-        );
+        document.getElementById("formFields");
 
     if (formFields) {
         formFields.innerHTML = `
@@ -943,14 +548,10 @@ function openAnnouncementModal() {
     }
 
     const modal =
-        document.getElementById(
-            "modal"
-        );
+        document.getElementById("modal");
 
     if (modal) {
-        modal.classList.add(
-            "show"
-        );
+        modal.classList.add("show");
     }
 }
 
@@ -962,50 +563,31 @@ function openMemberModal() {
 
 function closeModal() {
     const modal =
-        document.getElementById(
-            "modal"
-        );
+        document.getElementById("modal");
 
     if (modal) {
-        modal.classList.remove(
-            "show"
-        );
+        modal.classList.remove("show");
     }
 }
 
 function submitModal(e) {
     e.preventDefault();
 
-    const form =
-        new FormData(e.target);
+    const form = new FormData(e.target);
 
-    if (
-        modalType ===
-        "announcement"
-    ) {
+    if (modalType === "announcement") {
         announcements.unshift({
-            title:
-                form.get("title"),
-            text:
-                form.get("text"),
-            author:
-                "PH1 Guild",
-            timestamp:
-                new Date()
-                    .toISOString()
+            title: form.get("title"),
+            text: form.get("text"),
+            author: "PH1 Guild",
+            timestamp: new Date().toISOString()
         });
 
-        announcements =
-            announcements.slice(
-                0,
-                3
-            );
+        announcements = announcements.slice(0, 3);
 
         localStorage.setItem(
             "ph1_announcements",
-            JSON.stringify(
-                announcements
-            )
+            JSON.stringify(announcements)
         );
 
         currentAnnouncement = 0;
@@ -1019,29 +601,19 @@ function submitModal(e) {
 }
 
 function deleteAnnouncement(i) {
-    if (
-        !confirm(
-            "Delete this announcement?"
-        )
-    ) {
+    if (!confirm("Delete this announcement?")) {
         return;
     }
 
-    announcements.splice(
-        i,
-        1
-    );
+    announcements.splice(i, 1);
 
     localStorage.setItem(
         "ph1_announcements",
-        JSON.stringify(
-            announcements
-        )
+        JSON.stringify(announcements)
     );
 
     if (
-        currentAnnouncement >=
-        announcements.length
+        currentAnnouncement >= announcements.length
     ) {
         currentAnnouncement = 0;
     }
@@ -1051,13 +623,9 @@ function deleteAnnouncement(i) {
 
 function saveNotes() {
     const notes =
-        document.getElementById(
-            "attendanceNotes"
-        );
+        document.getElementById("attendanceNotes");
 
-    if (!notes) {
-        return;
-    }
+    if (!notes) return;
 
     localStorage.setItem(
         "ph1_notes",
@@ -1065,32 +633,22 @@ function saveNotes() {
     );
 
     const savedMessage =
-        document.getElementById(
-            "savedMessage"
-        );
+        document.getElementById("savedMessage");
 
     if (savedMessage) {
-        savedMessage.textContent =
-            "Saved locally ✓";
+        savedMessage.textContent = "Saved locally ✓";
 
         setTimeout(() => {
-            savedMessage.textContent =
-                "";
+            savedMessage.textContent = "";
         }, 1800);
     }
 }
 
 loadDiscordAnnouncements();
 loadMembers();
-loadHeroMembers();
 render();
 
 setInterval(
     loadDiscordAnnouncements,
     30000
-);
-
-setInterval(
-    loadHeroMembers,
-    60000
 );
