@@ -1,5 +1,5 @@
-const MEMBER_SHEET_ID = "14ygF1s48Yf6z2dRzf-K--L1DfqNzudIteJlsbpIfdvo";
-const MEMBER_SHEET_GID = "1347299641";
+const MEMBER_SHEET_ID = "1qmfkY1hoCYdslDwmQhPGsxyc0JnV006x7lBcFafTPrQ";
+const MEMBER_SHEET_GID = "804908968";
 
 let members = [];
 let announcements = [];
@@ -23,12 +23,20 @@ async function loadDiscordAnnouncements() {
         renderAnnouncement();
         updateAnnouncementCounters();
 
-        console.log(`Loaded ${announcements.length} Discord announcements.`);
+        console.log(
+            `Loaded ${announcements.length} Discord announcements.`
+        );
     } catch (error) {
-        console.error("Failed to load Discord announcements:", error);
+        console.error(
+            "Failed to load Discord announcements:",
+            error
+        );
 
-        const announcementList = document.getElementById("announcementList");
-        const announcementDots = document.getElementById("announcementDots");
+        const announcementList =
+            document.getElementById("announcementList");
+
+        const announcementDots =
+            document.getElementById("announcementDots");
 
         if (announcementList) {
             announcementList.innerHTML = `
@@ -47,7 +55,8 @@ async function loadDiscordAnnouncements() {
 }
 
 function renderAnnouncement() {
-    const display = document.getElementById("announcementList");
+    const display =
+        document.getElementById("announcementList");
 
     if (!display) return;
 
@@ -57,8 +66,13 @@ function renderAnnouncement() {
         display.innerHTML = `
             <article class="announcement-featured">
                 <div class="announcement-top">
-                    <span class="announcement-label">GUILD NEWS</span>
-                    <span class="announcement-date">NO ANNOUNCEMENTS</span>
+                    <span class="announcement-label">
+                        GUILD NEWS
+                    </span>
+
+                    <span class="announcement-date">
+                        NO ANNOUNCEMENTS
+                    </span>
                 </div>
 
                 <h3>No announcements yet</h3>
@@ -80,19 +94,24 @@ function renderAnnouncement() {
         currentAnnouncement = latest.length - 1;
     }
 
-    const announcement = latest[currentAnnouncement];
+    const announcement =
+        latest[currentAnnouncement];
 
     let date = "";
 
     if (announcement.timestamp) {
-        const parsedDate = new Date(announcement.timestamp);
+        const parsedDate =
+            new Date(announcement.timestamp);
 
         if (!isNaN(parsedDate.getTime())) {
-            date = parsedDate.toLocaleDateString("en-US", {
-                month: "2-digit",
-                day: "2-digit",
-                year: "numeric"
-            });
+            date = parsedDate.toLocaleDateString(
+                "en-US",
+                {
+                    month: "2-digit",
+                    day: "2-digit",
+                    year: "numeric"
+                }
+            );
         }
     }
 
@@ -100,35 +119,49 @@ function renderAnnouncement() {
         date = announcement.date || "";
     }
 
-    let message = announcement.text || "";
+    let message =
+        announcement.text || "";
 
-    message = message.replace(/\s+/g, " ").trim();
+    message = message
+        .replace(/\s+/g, " ")
+        .trim();
 
     if (message.length > 220) {
-        message = message.substring(0, 220) + "...";
+        message =
+            message.substring(0, 220) + "...";
     }
 
-    const title = announcement.title || "PH1 Guild Announcement";
-    const author = announcement.author || "PH1 Guild";
+    const title =
+        announcement.title ||
+        "PH1 Guild Announcement";
 
-    const discordLink = announcement.url
-        ? `
-            <a
-                href="${esc(announcement.url)}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="discord-link"
-            >
-                VIEW ON DISCORD →
-            </a>
-        `
-        : "";
+    const author =
+        announcement.author ||
+        "PH1 Guild";
+
+    const discordLink =
+        announcement.url
+            ? `
+                <a
+                    href="${esc(announcement.url)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="discord-link"
+                >
+                    VIEW ON DISCORD →
+                </a>
+            `
+            : "";
 
     const dots = latest
         .map(
             (_, index) => `
                 <button
-                    class="announcement-dot ${index === currentAnnouncement ? "active" : ""}"
+                    class="announcement-dot ${
+                        index === currentAnnouncement
+                            ? "active"
+                            : ""
+                    }"
                     onclick="showAnnouncement(${index})"
                     aria-label="Announcement ${index + 1}"
                 ></button>
@@ -176,7 +209,10 @@ function renderAnnouncement() {
                     </div>
                 </article>
 
-                <div class="announcement-dots" id="announcementDots">
+                <div
+                    class="announcement-dots"
+                    id="announcementDots"
+                >
                     ${dots}
                 </div>
             </div>
@@ -194,16 +230,20 @@ function renderAnnouncement() {
 }
 
 function showAnnouncement(index) {
-    const total = Math.min(announcements.length, 3);
+    const total =
+        Math.min(announcements.length, 3);
 
-    if (!total || index < 0 || index >= total) return;
+    if (!total || index < 0 || index >= total) {
+        return;
+    }
 
     currentAnnouncement = index;
     renderAnnouncement();
 }
 
 function previousAnnouncement() {
-    const total = Math.min(announcements.length, 3);
+    const total =
+        Math.min(announcements.length, 3);
 
     if (!total) return;
 
@@ -217,7 +257,8 @@ function previousAnnouncement() {
 }
 
 function nextAnnouncement() {
-    const total = Math.min(announcements.length, 3);
+    const total =
+        Math.min(announcements.length, 3);
 
     if (!total) return;
 
@@ -231,21 +272,29 @@ function nextAnnouncement() {
 }
 
 function updateAnnouncementCounters() {
-    const announcementCount = document.getElementById("announcementCount");
+    const announcementCount =
+        document.getElementById(
+            "announcementCount"
+        );
 
     if (announcementCount) {
-        announcementCount.textContent = announcements.length;
+        announcementCount.textContent =
+            announcements.length;
     }
 
-    const eventCount = document.getElementById("eventCount");
+    const eventCount =
+        document.getElementById("eventCount");
 
     if (eventCount) {
-        eventCount.textContent = announcements.filter(
-            announcement =>
-                /event|war|gvg|raid/i.test(
-                    `${announcement.title || ""} ${announcement.text || ""}`
-                )
-        ).length;
+        eventCount.textContent =
+            announcements.filter(
+                announcement =>
+                    /event|war|gvg|raid/i.test(
+                        `${announcement.title || ""} ${
+                            announcement.text || ""
+                        }`
+                    )
+            ).length;
     }
 }
 
@@ -256,7 +305,8 @@ async function loadMembers() {
     try {
         console.log("Loading PH1 guild members...");
 
-        const response = await fetch(url);
+        const response =
+            await fetch(url);
 
         if (!response.ok) {
             throw new Error(
@@ -264,15 +314,22 @@ async function loadMembers() {
             );
         }
 
-        const csv = await response.text();
+        const csv =
+            await response.text();
 
-        members = parseCSV(csv);
+        members =
+            parseCSV(csv);
 
-        console.log(`Loaded ${members.length} guild members.`);
+        console.log(
+            `Loaded ${members.length} guild members.`
+        );
 
         renderMembers();
     } catch (error) {
-        console.error("Failed to load PH1 guild members:", error);
+        console.error(
+            "Failed to load PH1 guild members:",
+            error
+        );
 
         members = [];
 
@@ -290,20 +347,31 @@ function parseCSV(csv) {
         const char = csv[i];
 
         if (char === '"') {
-            if (insideQuotes && csv[i + 1] === '"') {
+            if (
+                insideQuotes &&
+                csv[i + 1] === '"'
+            ) {
                 value += '"';
                 i++;
             } else {
-                insideQuotes = !insideQuotes;
+                insideQuotes =
+                    !insideQuotes;
             }
-        } else if (char === "," && !insideQuotes) {
+        } else if (
+            char === "," &&
+            !insideQuotes
+        ) {
             row.push(value.trim());
             value = "";
         } else if (
-            (char === "\n" || char === "\r") &&
+            (char === "\n" ||
+                char === "\r") &&
             !insideQuotes
         ) {
-            if (value !== "" || row.length > 0) {
+            if (
+                value !== "" ||
+                row.length > 0
+            ) {
                 row.push(value.trim());
                 rows.push(row);
 
@@ -311,7 +379,10 @@ function parseCSV(csv) {
                 value = "";
             }
 
-            if (char === "\r" && csv[i + 1] === "\n") {
+            if (
+                char === "\r" &&
+                csv[i + 1] === "\n"
+            ) {
                 i++;
             }
         } else {
@@ -319,7 +390,10 @@ function parseCSV(csv) {
         }
     }
 
-    if (value !== "" || row.length > 0) {
+    if (
+        value !== "" ||
+        row.length > 0
+    ) {
         row.push(value.trim());
         rows.push(row);
     }
@@ -328,20 +402,34 @@ function parseCSV(csv) {
     let ignIndex = -1;
     let classIndex = -1;
 
-    for (let i = 0; i < rows.length; i++) {
-        const headers = rows[i].map(header =>
-            header.trim().toLowerCase()
-        );
+    for (
+        let i = 0;
+        i < rows.length;
+        i++
+    ) {
+        const headers =
+            rows[i].map(header =>
+                header
+                    .trim()
+                    .toLowerCase()
+            );
 
-        const foundIgn = headers.findIndex(
-            header => header === "ign"
-        );
+        const foundIgn =
+            headers.findIndex(
+                header =>
+                    header === "ign"
+            );
 
-        const foundClass = headers.findIndex(
-            header => header === "class"
-        );
+        const foundClass =
+            headers.findIndex(
+                header =>
+                    header === "class"
+            );
 
-        if (foundIgn !== -1 && foundClass !== -1) {
+        if (
+            foundIgn !== -1 &&
+            foundClass !== -1
+        ) {
             headerRowIndex = i;
             ignIndex = foundIgn;
             classIndex = foundClass;
@@ -349,25 +437,41 @@ function parseCSV(csv) {
         }
     }
 
-    console.log("PH1 header row:", headerRowIndex);
-    console.log("IGN column:", ignIndex);
-    console.log("CLASS column:", classIndex);
+    console.log(
+        "PH1 header row:",
+        headerRowIndex
+    );
+
+    console.log(
+        "IGN column:",
+        ignIndex
+    );
+
+    console.log(
+        "CLASS column:",
+        classIndex
+    );
 
     if (headerRowIndex === -1) {
-        console.error("Could not find IGN + CLASS headers.");
+        console.error(
+            "Could not find IGN + CLASS headers."
+        );
+
         return [];
     }
 
     return rows
         .slice(headerRowIndex + 1)
         .map(row => {
-            const name = row[ignIndex]
-                ? row[ignIndex].trim()
-                : "";
+            const name =
+                row[ignIndex]
+                    ? row[ignIndex].trim()
+                    : "";
 
-            const rank = row[classIndex]
-                ? row[classIndex].trim()
-                : "";
+            const rank =
+                row[classIndex]
+                    ? row[classIndex].trim()
+                    : "";
 
             return {
                 name,
@@ -376,9 +480,15 @@ function parseCSV(csv) {
             };
         })
         .filter(member => {
-            if (!member.name) return false;
+            if (!member.name) {
+                return false;
+            }
 
-            if (member.name.toUpperCase() === "TOTAL") {
+            if (
+                member.name
+                    .toUpperCase() ===
+                "TOTAL"
+            ) {
                 return false;
             }
 
@@ -388,7 +498,9 @@ function parseCSV(csv) {
 
 function renderMembers() {
     const heroMemberList =
-        document.getElementById("heroMemberList");
+        document.getElementById(
+            "heroMemberList"
+        );
 
     if (heroMemberList) {
         if (!members.length) {
@@ -398,26 +510,29 @@ function renderMembers() {
                 </div>
             `;
         } else {
-            heroMemberList.innerHTML = members
-                .map(
-                    member => `
-                        <div class="hero-member-row">
-                            <span class="hero-member-name">
-                                ${esc(member.name)}
-                            </span>
+            heroMemberList.innerHTML =
+                members
+                    .map(
+                        member => `
+                            <div class="hero-member-row">
+                                <span class="hero-member-name">
+                                    ${esc(member.name)}
+                                </span>
 
-                            <span class="hero-member-class">
-                                ${esc(member.rank)}
-                            </span>
-                        </div>
-                    `
-                )
-                .join("");
+                                <span class="hero-member-class">
+                                    ${esc(member.rank)}
+                                </span>
+                            </div>
+                        `
+                    )
+                    .join("");
         }
     }
 
     const memberList =
-        document.getElementById("memberList");
+        document.getElementById(
+            "memberList"
+        );
 
     if (memberList) {
         if (!members.length) {
@@ -427,41 +542,47 @@ function renderMembers() {
                 </div>
             `;
         } else {
-            memberList.innerHTML = members
-                .map(
-                    member => `
-                        <article class="member">
-                            <div class="avatar">
-                                ${esc(member.icon)}
-                            </div>
-
-                            <div>
-                                <h3>
-                                    ${esc(member.name)}
-                                </h3>
-
-                                <div class="rank">
-                                    ${esc(member.rank)}
+            memberList.innerHTML =
+                members
+                    .map(
+                        member => `
+                            <article class="member">
+                                <div class="avatar">
+                                    ${esc(member.icon)}
                                 </div>
-                            </div>
-                        </article>
-                    `
-                )
-                .join("");
+
+                                <div>
+                                    <h3>
+                                        ${esc(member.name)}
+                                    </h3>
+
+                                    <div class="rank">
+                                        ${esc(member.rank)}
+                                    </div>
+                                </div>
+                            </article>
+                        `
+                    )
+                    .join("");
         }
     }
 
     const memberCount =
-        document.getElementById("memberCount");
+        document.getElementById(
+            "memberCount"
+        );
 
     if (memberCount) {
-        memberCount.textContent = members.length;
+        memberCount.textContent =
+            members.length;
     }
 }
 
 function showMemberError() {
     const heroMemberList =
-        document.getElementById("heroMemberList");
+        document.getElementById(
+            "heroMemberList"
+        );
 
     if (heroMemberList) {
         heroMemberList.innerHTML = `
@@ -472,7 +593,9 @@ function showMemberError() {
     }
 
     const memberList =
-        document.getElementById("memberList");
+        document.getElementById(
+            "memberList"
+        );
 
     if (memberList) {
         memberList.innerHTML = `
@@ -483,7 +606,9 @@ function showMemberError() {
     }
 
     const memberCount =
-        document.getElementById("memberCount");
+        document.getElementById(
+            "memberCount"
+        );
 
     if (memberCount) {
         memberCount.textContent = "0";
@@ -495,24 +620,29 @@ function render() {
     updateAnnouncementCounters();
 
     const attendanceNotes =
-        document.getElementById("attendanceNotes");
+        document.getElementById(
+            "attendanceNotes"
+        );
 
     if (attendanceNotes) {
         attendanceNotes.value =
-            localStorage.getItem("ph1_notes") || "";
+            localStorage.getItem(
+                "ph1_notes"
+            ) || "";
     }
 }
 
 function esc(s) {
     return String(s ?? "").replace(
         /[&<>"']/g,
-        c => ({
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-        }[c])
+        c =>
+            ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[c]
     );
 }
 
@@ -520,14 +650,19 @@ function openAnnouncementModal() {
     modalType = "announcement";
 
     const modalTitle =
-        document.getElementById("modalTitle");
+        document.getElementById(
+            "modalTitle"
+        );
 
     if (modalTitle) {
-        modalTitle.textContent = "Add Announcement";
+        modalTitle.textContent =
+            "Add Announcement";
     }
 
     const formFields =
-        document.getElementById("formFields");
+        document.getElementById(
+            "formFields"
+        );
 
     if (formFields) {
         formFields.innerHTML = `
@@ -573,21 +708,26 @@ function closeModal() {
 function submitModal(e) {
     e.preventDefault();
 
-    const form = new FormData(e.target);
+    const form =
+        new FormData(e.target);
 
     if (modalType === "announcement") {
         announcements.unshift({
             title: form.get("title"),
             text: form.get("text"),
             author: "PH1 Guild",
-            timestamp: new Date().toISOString()
+            timestamp:
+                new Date().toISOString()
         });
 
-        announcements = announcements.slice(0, 3);
+        announcements =
+            announcements.slice(0, 3);
 
         localStorage.setItem(
             "ph1_announcements",
-            JSON.stringify(announcements)
+            JSON.stringify(
+                announcements
+            )
         );
 
         currentAnnouncement = 0;
@@ -601,7 +741,11 @@ function submitModal(e) {
 }
 
 function deleteAnnouncement(i) {
-    if (!confirm("Delete this announcement?")) {
+    if (
+        !confirm(
+            "Delete this announcement?"
+        )
+    ) {
         return;
     }
 
@@ -609,11 +753,14 @@ function deleteAnnouncement(i) {
 
     localStorage.setItem(
         "ph1_announcements",
-        JSON.stringify(announcements)
+        JSON.stringify(
+            announcements
+        )
     );
 
     if (
-        currentAnnouncement >= announcements.length
+        currentAnnouncement >=
+        announcements.length
     ) {
         currentAnnouncement = 0;
     }
@@ -623,7 +770,9 @@ function deleteAnnouncement(i) {
 
 function saveNotes() {
     const notes =
-        document.getElementById("attendanceNotes");
+        document.getElementById(
+            "attendanceNotes"
+        );
 
     if (!notes) return;
 
@@ -633,13 +782,17 @@ function saveNotes() {
     );
 
     const savedMessage =
-        document.getElementById("savedMessage");
+        document.getElementById(
+            "savedMessage"
+        );
 
     if (savedMessage) {
-        savedMessage.textContent = "Saved locally ✓";
+        savedMessage.textContent =
+            "Saved locally ✓";
 
         setTimeout(() => {
-            savedMessage.textContent = "";
+            savedMessage.textContent =
+                "";
         }, 1800);
     }
 }
