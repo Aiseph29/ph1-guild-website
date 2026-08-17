@@ -250,7 +250,7 @@
           <div>
 
             <strong>
-              📊 PH1 Guild Attendance
+              PH1 Guild Attendance
             </strong>
 
             <span>
@@ -259,32 +259,27 @@
 
           </div>
 
-
-          <a
-            href="https://docs.google.com/spreadsheets/d/1qWbAc86k3ogVYZeF5mb7rLKSy41MN6o_MTmYHEL6Hr8/edit"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn small ghost"
-          >
-            Open Google Sheet
-          </a>
-
         </div>
 
-
-        <!-- Google Spreadsheet -->
-
-        <div class="spreadsheet-wrapper">
-
-          <iframe
-            src="https://docs.google.com/spreadsheets/d/1qWbAc86k3ogVYZeF5mb7rLKSy41MN6o_MTmYHEL6Hr8/edit?usp=sharing"
-            class="spreadsheet"
-            title="PH1 Guild Attendance"
-          >
-          </iframe>
-
-        </div>
-
+        <div class="attendance-table-wrap">
+          <table class="attendance-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>IGN</th>
+                <th>Gear Rating</th>
+                <th>Date</th>
+                <th>Class</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceList">
+              <tr>
+                <td colspan="5" class="attendance-loading">
+                  Loading attendance...
+                </td>
+              </tr>
+            </tbody>
+          </table>
       </div>
 
 
