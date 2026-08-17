@@ -1,7 +1,17 @@
-const MEMBER_SHEET_ID = "1qmfkY1hoCYdslDwmQhPGsxyc0JnV006x7lBcFafTPrQ";
-const MEMBER_SHEET_GID = "804908968";
+const MEMBER_SHEET_ID =
+    "14ygF1s48Yf6z2dRzf-K--L1DfqNzudIteJlsbpIfdvo";
+
+const MEMBER_SHEET_GID =
+    "1347299641";
+
+const HERO_SHEET_ID =
+    "1qmfkY1hoCYdslDwmQhPGsxyc0JnV006x7lBcFafTPrQ";
+
+const HERO_SHEET_GID =
+    "804908968";
 
 let members = [];
+let heroMembers = [];
 let announcements = [];
 let currentAnnouncement = 0;
 
@@ -60,7 +70,8 @@ function renderAnnouncement() {
 
     if (!display) return;
 
-    const latest = announcements.slice(0, 3);
+    const latest =
+        announcements.slice(0, 3);
 
     if (!latest.length) {
         display.innerHTML = `
@@ -104,27 +115,30 @@ function renderAnnouncement() {
             new Date(announcement.timestamp);
 
         if (!isNaN(parsedDate.getTime())) {
-            date = parsedDate.toLocaleDateString(
-                "en-US",
-                {
-                    month: "2-digit",
-                    day: "2-digit",
-                    year: "numeric"
-                }
-            );
+            date =
+                parsedDate.toLocaleDateString(
+                    "en-US",
+                    {
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "numeric"
+                    }
+                );
         }
     }
 
     if (!date) {
-        date = announcement.date || "";
+        date =
+            announcement.date || "";
     }
 
     let message =
         announcement.text || "";
 
-    message = message
-        .replace(/\s+/g, " ")
-        .trim();
+    message =
+        message
+            .replace(/\s+/g, " ")
+            .trim();
 
     if (message.length > 220) {
         message =
@@ -153,21 +167,22 @@ function renderAnnouncement() {
             `
             : "";
 
-    const dots = latest
-        .map(
-            (_, index) => `
-                <button
-                    class="announcement-dot ${
-                        index === currentAnnouncement
-                            ? "active"
-                            : ""
-                    }"
-                    onclick="showAnnouncement(${index})"
-                    aria-label="Announcement ${index + 1}"
-                ></button>
-            `
-        )
-        .join("");
+    const dots =
+        latest
+            .map(
+                (_, index) => `
+                    <button
+                        class="announcement-dot ${
+                            index === currentAnnouncement
+                                ? "active"
+                                : ""
+                        }"
+                        onclick="showAnnouncement(${index})"
+                        aria-label="Announcement ${index + 1}"
+                    ></button>
+                `
+            )
+            .join("");
 
     display.innerHTML = `
         <div class="announcement-carousel">
@@ -233,11 +248,16 @@ function showAnnouncement(index) {
     const total =
         Math.min(announcements.length, 3);
 
-    if (!total || index < 0 || index >= total) {
+    if (
+        !total ||
+        index < 0 ||
+        index >= total
+    ) {
         return;
     }
 
     currentAnnouncement = index;
+
     renderAnnouncement();
 }
 
@@ -250,7 +270,8 @@ function previousAnnouncement() {
     currentAnnouncement--;
 
     if (currentAnnouncement < 0) {
-        currentAnnouncement = total - 1;
+        currentAnnouncement =
+            total - 1;
     }
 
     renderAnnouncement();
@@ -283,14 +304,18 @@ function updateAnnouncementCounters() {
     }
 
     const eventCount =
-        document.getElementById("eventCount");
+        document.getElementById(
+            "eventCount"
+        );
 
     if (eventCount) {
         eventCount.textContent =
             announcements.filter(
                 announcement =>
                     /event|war|gvg|raid/i.test(
-                        `${announcement.title || ""} ${
+                        `${
+                            announcement.title || ""
+                        } ${
                             announcement.text || ""
                         }`
                     )
@@ -303,7 +328,9 @@ async function loadMembers() {
         `https://docs.google.com/spreadsheets/d/${MEMBER_SHEET_ID}/export?format=csv&gid=${MEMBER_SHEET_GID}`;
 
     try {
-        console.log("Loading PH1 guild members...");
+        console.log(
+            "Loading PH1 guild members..."
+        );
 
         const response =
             await fetch(url);
@@ -318,7 +345,7 @@ async function loadMembers() {
             await response.text();
 
         members =
-            parseCSV(csv);
+            parseMemberCSV(csv);
 
         console.log(
             `Loaded ${members.length} guild members.`
@@ -337,66 +364,50 @@ async function loadMembers() {
     }
 }
 
-function parseCSV(csv) {
-    const rows = [];
-    let row = [];
-    let value = "";
-    let insideQuotes = false;
+async function loadHeroMembers() {
+    const url =
+        `https://docs.google.com/spreadsheets/d/${HERO_SHEET_ID}/export?format=csv&gid=${HERO_SHEET_GID}`;
 
-    for (let i = 0; i < csv.length; i++) {
-        const char = csv[i];
+    try {
+        console.log(
+            "Loading PH1 gear rating progress..."
+        );
 
-        if (char === '"') {
-            if (
-                insideQuotes &&
-                csv[i + 1] === '"'
-            ) {
-                value += '"';
-                i++;
-            } else {
-                insideQuotes =
-                    !insideQuotes;
-            }
-        } else if (
-            char === "," &&
-            !insideQuotes
-        ) {
-            row.push(value.trim());
-            value = "";
-        } else if (
-            (char === "\n" ||
-                char === "\r") &&
-            !insideQuotes
-        ) {
-            if (
-                value !== "" ||
-                row.length > 0
-            ) {
-                row.push(value.trim());
-                rows.push(row);
+        const response =
+            await fetch(url);
 
-                row = [];
-                value = "";
-            }
-
-            if (
-                char === "\r" &&
-                csv[i + 1] === "\n"
-            ) {
-                i++;
-            }
-        } else {
-            value += char;
+        if (!response.ok) {
+            throw new Error(
+                `Gear sheet returned HTTP ${response.status}`
+            );
         }
-    }
 
-    if (
-        value !== "" ||
-        row.length > 0
-    ) {
-        row.push(value.trim());
-        rows.push(row);
+        const csv =
+            await response.text();
+
+        heroMembers =
+            parseHeroCSV(csv);
+
+        console.log(
+            `Loaded ${heroMembers.length} hero members.`
+        );
+
+        renderHeroMembers();
+    } catch (error) {
+        console.error(
+            "Failed to load PH1 gear rating progress:",
+            error
+        );
+
+        heroMembers = [];
+
+        showHeroMemberError();
     }
+}
+
+function parseMemberCSV(csv) {
+    const rows =
+        parseCSVRows(csv);
 
     let headerRowIndex = -1;
     let ignIndex = -1;
@@ -437,21 +448,6 @@ function parseCSV(csv) {
         }
     }
 
-    console.log(
-        "PH1 header row:",
-        headerRowIndex
-    );
-
-    console.log(
-        "IGN column:",
-        ignIndex
-    );
-
-    console.log(
-        "CLASS column:",
-        classIndex
-    );
-
     if (headerRowIndex === -1) {
         console.error(
             "Could not find IGN + CLASS headers."
@@ -484,88 +480,348 @@ function parseCSV(csv) {
                 return false;
             }
 
-            if (
+            return (
                 member.name
-                    .toUpperCase() ===
+                    .toUpperCase() !==
                 "TOTAL"
-            ) {
-                return false;
-            }
-
-            return true;
+            );
         });
 }
 
-function renderMembers() {
+function parseHeroCSV(csv) {
+    const rows =
+        parseCSVRows(csv);
+
+    if (!rows.length) {
+        return [];
+    }
+
+    let headerRowIndex = -1;
+    let timestampIndex = -1;
+    let ignIndex = -1;
+    let gearIndex = -1;
+    let dateIndex = -1;
+    let classIndex = -1;
+
+    for (
+        let i = 0;
+        i < rows.length;
+        i++
+    ) {
+        const headers =
+            rows[i].map(header =>
+                header
+                    .trim()
+                    .toLowerCase()
+            );
+
+        const foundTimestamp =
+            headers.findIndex(
+                header =>
+                    header ===
+                    "timestamp"
+            );
+
+        const foundIgn =
+            headers.findIndex(
+                header =>
+                    header === "ign"
+            );
+
+        const foundGear =
+            headers.findIndex(
+                header =>
+                    header ===
+                    "gear rating"
+            );
+
+        const foundDate =
+            headers.findIndex(
+                header =>
+                    header === "date"
+            );
+
+        const foundClass =
+            headers.findIndex(
+                header =>
+                    header === "class"
+            );
+
+        if (
+            foundIgn !== -1 &&
+            foundGear !== -1 &&
+            foundClass !== -1
+        ) {
+            headerRowIndex = i;
+            timestampIndex =
+                foundTimestamp;
+            ignIndex = foundIgn;
+            gearIndex = foundGear;
+            dateIndex = foundDate;
+            classIndex = foundClass;
+            break;
+        }
+    }
+
+    if (headerRowIndex === -1) {
+        console.error(
+            "Could not find IGN, GEAR RATING and CLASS headers."
+        );
+
+        return [];
+    }
+
+    const latestMembers =
+        new Map();
+
+    rows
+        .slice(headerRowIndex + 1)
+        .forEach(row => {
+            const name =
+                row[ignIndex]
+                    ? row[ignIndex].trim()
+                    : "";
+
+            if (!name) {
+                return;
+            }
+
+            if (
+                name.toUpperCase() ===
+                "TOTAL"
+            ) {
+                return;
+            }
+
+            const timestamp =
+                timestampIndex !== -1
+                    ? row[timestampIndex]
+                    : "";
+
+            const gearRating =
+                row[gearIndex]
+                    ? row[gearIndex].trim()
+                    : "";
+
+            const date =
+                dateIndex !== -1 &&
+                row[dateIndex]
+                    ? row[dateIndex].trim()
+                    : "";
+
+            const rank =
+                row[classIndex]
+                    ? row[classIndex].trim()
+                    : "";
+
+            const existing =
+                latestMembers.get(
+                    name.toLowerCase()
+                );
+
+            if (!existing) {
+                latestMembers.set(
+                    name.toLowerCase(),
+                    {
+                        name,
+                        gearRating,
+                        rank,
+                        date,
+                        timestamp
+                    }
+                );
+
+                return;
+            }
+
+            const newTime =
+                new Date(timestamp)
+                    .getTime();
+
+            const oldTime =
+                new Date(
+                    existing.timestamp
+                ).getTime();
+
+            if (
+                !isNaN(newTime) &&
+                (
+                    isNaN(oldTime) ||
+                    newTime > oldTime
+                )
+            ) {
+                latestMembers.set(
+                    name.toLowerCase(),
+                    {
+                        name,
+                        gearRating,
+                        rank,
+                        date,
+                        timestamp
+                    }
+                );
+            }
+        });
+
+    return [
+        ...latestMembers.values()
+    ];
+}
+
+function parseCSVRows(csv) {
+    const rows = [];
+    let row = [];
+    let value = "";
+    let insideQuotes = false;
+
+    for (
+        let i = 0;
+        i < csv.length;
+        i++
+    ) {
+        const char = csv[i];
+
+        if (char === '"') {
+            if (
+                insideQuotes &&
+                csv[i + 1] === '"'
+            ) {
+                value += '"';
+                i++;
+            } else {
+                insideQuotes =
+                    !insideQuotes;
+            }
+        } else if (
+            char === "," &&
+            !insideQuotes
+        ) {
+            row.push(value.trim());
+            value = "";
+        } else if (
+            (
+                char === "\n" ||
+                char === "\r"
+            ) &&
+            !insideQuotes
+        ) {
+            if (
+                value !== "" ||
+                row.length > 0
+            ) {
+                row.push(value.trim());
+                rows.push(row);
+
+                row = [];
+                value = "";
+            }
+
+            if (
+                char === "\r" &&
+                csv[i + 1] === "\n"
+            ) {
+                i++;
+            }
+        } else {
+            value += char;
+        }
+    }
+
+    if (
+        value !== "" ||
+        row.length > 0
+    ) {
+        row.push(value.trim());
+        rows.push(row);
+    }
+
+    return rows;
+}
+
+function renderHeroMembers() {
     const heroMemberList =
         document.getElementById(
             "heroMemberList"
         );
 
-    if (heroMemberList) {
-        if (!members.length) {
-            heroMemberList.innerHTML = `
-                <div class="member-loading">
-                    No members found.
-                </div>
-            `;
-        } else {
-            heroMemberList.innerHTML =
-                members
-                    .map(
-                        member => `
-                            <div class="hero-member-row">
-                                <span class="hero-member-name">
-                                    ${esc(member.name)}
-                                </span>
-
-                                <span class="hero-member-class">
-                                    ${esc(member.rank)}
-                                </span>
-                            </div>
-                        `
-                    )
-                    .join("");
-        }
+    if (!heroMemberList) {
+        return;
     }
 
+    if (!heroMembers.length) {
+        heroMemberList.innerHTML = `
+            <div class="member-loading">
+                No gear rating data found.
+            </div>
+        `;
+
+        return;
+    }
+
+    heroMemberList.innerHTML =
+        heroMembers
+            .map(
+                member => `
+                    <div class="hero-member-row">
+                        <span class="hero-member-name">
+                            ${esc(member.name)}
+                        </span>
+
+                        <span class="hero-member-class">
+                            ${esc(member.rank)}
+                        </span>
+
+                        <span class="hero-member-gear">
+                            ${esc(member.gearRating)}
+                        </span>
+                    </div>
+                `
+            )
+            .join("");
+}
+
+function renderMembers() {
     const memberList =
         document.getElementById(
             "memberList"
         );
 
-    if (memberList) {
-        if (!members.length) {
-            memberList.innerHTML = `
-                <div class="member-loading">
-                    No guild members found.
-                </div>
-            `;
-        } else {
-            memberList.innerHTML =
-                members
-                    .map(
-                        member => `
-                            <article class="member">
-                                <div class="avatar">
-                                    ${esc(member.icon)}
-                                </div>
-
-                                <div>
-                                    <h3>
-                                        ${esc(member.name)}
-                                    </h3>
-
-                                    <div class="rank">
-                                        ${esc(member.rank)}
-                                    </div>
-                                </div>
-                            </article>
-                        `
-                    )
-                    .join("");
-        }
+    if (!memberList) {
+        return;
     }
+
+    if (!members.length) {
+        memberList.innerHTML = `
+            <div class="member-loading">
+                No guild members found.
+            </div>
+        `;
+
+        return;
+    }
+
+    memberList.innerHTML =
+        members
+            .map(
+                member => `
+                    <article class="member">
+                        <div class="avatar">
+                            ${esc(member.icon)}
+                        </div>
+
+                        <div>
+                            <h3>
+                                ${esc(member.name)}
+                            </h3>
+
+                            <div class="rank">
+                                ${esc(member.rank)}
+                            </div>
+                        </div>
+                    </article>
+                `
+            )
+            .join("");
 
     const memberCount =
         document.getElementById(
@@ -579,19 +835,6 @@ function renderMembers() {
 }
 
 function showMemberError() {
-    const heroMemberList =
-        document.getElementById(
-            "heroMemberList"
-        );
-
-    if (heroMemberList) {
-        heroMemberList.innerHTML = `
-            <div class="member-loading">
-                Unable to load guild members.
-            </div>
-        `;
-    }
-
     const memberList =
         document.getElementById(
             "memberList"
@@ -611,7 +854,23 @@ function showMemberError() {
         );
 
     if (memberCount) {
-        memberCount.textContent = "0";
+        memberCount.textContent =
+            "0";
+    }
+}
+
+function showHeroMemberError() {
+    const heroMemberList =
+        document.getElementById(
+            "heroMemberList"
+        );
+
+    if (heroMemberList) {
+        heroMemberList.innerHTML = `
+            <div class="member-loading">
+                Unable to load gear rating data.
+            </div>
+        `;
     }
 }
 
@@ -647,7 +906,8 @@ function esc(s) {
 }
 
 function openAnnouncementModal() {
-    modalType = "announcement";
+    modalType =
+        "announcement";
 
     const modalTitle =
         document.getElementById(
@@ -683,10 +943,14 @@ function openAnnouncementModal() {
     }
 
     const modal =
-        document.getElementById("modal");
+        document.getElementById(
+            "modal"
+        );
 
     if (modal) {
-        modal.classList.add("show");
+        modal.classList.add(
+            "show"
+        );
     }
 }
 
@@ -698,10 +962,14 @@ function openMemberModal() {
 
 function closeModal() {
     const modal =
-        document.getElementById("modal");
+        document.getElementById(
+            "modal"
+        );
 
     if (modal) {
-        modal.classList.remove("show");
+        modal.classList.remove(
+            "show"
+        );
     }
 }
 
@@ -711,17 +979,27 @@ function submitModal(e) {
     const form =
         new FormData(e.target);
 
-    if (modalType === "announcement") {
+    if (
+        modalType ===
+        "announcement"
+    ) {
         announcements.unshift({
-            title: form.get("title"),
-            text: form.get("text"),
-            author: "PH1 Guild",
+            title:
+                form.get("title"),
+            text:
+                form.get("text"),
+            author:
+                "PH1 Guild",
             timestamp:
-                new Date().toISOString()
+                new Date()
+                    .toISOString()
         });
 
         announcements =
-            announcements.slice(0, 3);
+            announcements.slice(
+                0,
+                3
+            );
 
         localStorage.setItem(
             "ph1_announcements",
@@ -749,7 +1027,10 @@ function deleteAnnouncement(i) {
         return;
     }
 
-    announcements.splice(i, 1);
+    announcements.splice(
+        i,
+        1
+    );
 
     localStorage.setItem(
         "ph1_announcements",
@@ -774,7 +1055,9 @@ function saveNotes() {
             "attendanceNotes"
         );
 
-    if (!notes) return;
+    if (!notes) {
+        return;
+    }
 
     localStorage.setItem(
         "ph1_notes",
@@ -799,9 +1082,15 @@ function saveNotes() {
 
 loadDiscordAnnouncements();
 loadMembers();
+loadHeroMembers();
 render();
 
 setInterval(
     loadDiscordAnnouncements,
     30000
+);
+
+setInterval(
+    loadHeroMembers,
+    60000
 );
