@@ -342,6 +342,32 @@ function parseAttendanceCSV(csv) {
         .filter(record => record.name);
 }
 
+
+function parseGearRating(value) {
+    if (!value) return 0;
+
+    const text = String(value)
+        .trim()
+        .toLowerCase()
+        .replace(/,/g, "");
+
+    const match = text.match(/^([\d.]+)\s*([km]?)$/);
+
+    if (!match) {
+        const number = parseFloat(text);
+        return Number.isNaN(number) ? 0 : number;
+    }
+
+    const number = parseFloat(match[1]);
+
+    if (Number.isNaN(number)) return 0;
+
+    if (match[2] === "k") return number * 1000;
+    if (match[2] === "m") return number * 1000000;
+
+    return number;
+}
+
 function renderAttendance() {
     const list =
         document.getElementById("attendanceList");
@@ -359,7 +385,11 @@ function renderAttendance() {
         return;
     }
 
-    list.innerHTML = attendance
+    const sortedAttendance = [...attendance].sort((a, b) =>
+        parseGearRating(b.gear) - parseGearRating(a.gear)
+    );
+
+    list.innerHTML = sortedAttendance
         .map(record => `
             <tr>
                 <td>${esc(record.timestamp || "—")}</td>
