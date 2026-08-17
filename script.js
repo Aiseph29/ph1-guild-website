@@ -1,5 +1,8 @@
-const MEMBER_SHEET_ID = "14ygF1s48Yf6z2dRzf-K--L1DfqNzudIteJlsbpIfdvo";
-const MEMBER_SHEET_GID = "1347299641";
+const MEMBER_SHEET_ID =
+    "1qmfkY1hoCYdslDwmQhPGsxyc0JnV006x7lBcFafTPrQ";
+
+const MEMBER_SHEET_GID =
+    "804908968";
 
 let members = [];
 let announcements = [];
@@ -259,9 +262,7 @@ async function loadMembers() {
         const response = await fetch(url);
 
         if (!response.ok) {
-            throw new Error(
-                `Google Sheet returned HTTP ${response.status}`
-            );
+            throw new Error(`HTTP ${response.status}`);
         }
 
         const csv = await response.text();
@@ -272,10 +273,9 @@ async function loadMembers() {
 
         renderMembers();
     } catch (error) {
-        console.error("Failed to load PH1 guild members:", error);
+        console.error("Failed to load guild members:", error);
 
         members = [];
-
         showMemberError();
     }
 }
@@ -306,7 +306,6 @@ function parseCSV(csv) {
             if (value !== "" || row.length > 0) {
                 row.push(value.trim());
                 rows.push(row);
-
                 row = [];
                 value = "";
             }
@@ -333,57 +332,33 @@ function parseCSV(csv) {
             header.trim().toLowerCase()
         );
 
-        const foundIgn = headers.findIndex(
-            header => header === "ign"
-        );
+        const ign = headers.indexOf("ign");
+        const className = headers.indexOf("class");
 
-        const foundClass = headers.findIndex(
-            header => header === "class"
-        );
-
-        if (foundIgn !== -1 && foundClass !== -1) {
+        if (ign !== -1 && className !== -1) {
             headerRowIndex = i;
-            ignIndex = foundIgn;
-            classIndex = foundClass;
+            ignIndex = ign;
+            classIndex = className;
             break;
         }
     }
 
-    console.log("PH1 header row:", headerRowIndex);
-    console.log("IGN column:", ignIndex);
-    console.log("CLASS column:", classIndex);
-
     if (headerRowIndex === -1) {
-        console.error("Could not find IGN + CLASS headers.");
+        console.error("Could not find IGN and CLASS columns.");
         return [];
     }
 
     return rows
         .slice(headerRowIndex + 1)
-        .map(row => {
-            const name = row[ignIndex]
-                ? row[ignIndex].trim()
-                : "";
-
-            const rank = row[classIndex]
-                ? row[classIndex].trim()
-                : "";
-
-            return {
-                name,
-                rank,
-                icon: "⚔️"
-            };
-        })
-        .filter(member => {
-            if (!member.name) return false;
-
-            if (member.name.toUpperCase() === "TOTAL") {
-                return false;
-            }
-
-            return true;
-        });
+        .map(row => ({
+            name: row[ignIndex]?.trim() || "",
+            rank: row[classIndex]?.trim() || "",
+            icon: "⚔️"
+        }))
+        .filter(member =>
+            member.name &&
+            member.name.toUpperCase() !== "TOTAL"
+        );
 }
 
 function renderMembers() {
@@ -391,64 +366,50 @@ function renderMembers() {
         document.getElementById("heroMemberList");
 
     if (heroMemberList) {
-        if (!members.length) {
-            heroMemberList.innerHTML = `
+        heroMemberList.innerHTML = members.length
+            ? members.map(member => `
+                <div class="hero-member-row">
+                    <span class="hero-member-name">
+                        ${esc(member.name)}
+                    </span>
+
+                    <span class="hero-member-class">
+                        ${esc(member.rank)}
+                    </span>
+                </div>
+            `).join("")
+            : `
                 <div class="member-loading">
                     No members found.
                 </div>
             `;
-        } else {
-            heroMemberList.innerHTML = members
-                .map(
-                    member => `
-                        <div class="hero-member-row">
-                            <span class="hero-member-name">
-                                ${esc(member.name)}
-                            </span>
-
-                            <span class="hero-member-class">
-                                ${esc(member.rank)}
-                            </span>
-                        </div>
-                    `
-                )
-                .join("");
-        }
     }
 
     const memberList =
         document.getElementById("memberList");
 
     if (memberList) {
-        if (!members.length) {
-            memberList.innerHTML = `
+        memberList.innerHTML = members.length
+            ? members.map(member => `
+                <article class="member">
+                    <div class="avatar">
+                        ${esc(member.icon)}
+                    </div>
+
+                    <div>
+                        <h3>${esc(member.name)}</h3>
+
+                        <div class="rank">
+                            ${esc(member.rank)}
+                        </div>
+                    </div>
+                </article>
+            `).join("")
+            : `
                 <div class="member-loading">
                     No guild members found.
                 </div>
             `;
-        } else {
-            memberList.innerHTML = members
-                .map(
-                    member => `
-                        <article class="member">
-                            <div class="avatar">
-                                ${esc(member.icon)}
-                            </div>
-
-                            <div>
-                                <h3>
-                                    ${esc(member.name)}
-                                </h3>
-
-                                <div class="rank">
-                                    ${esc(member.rank)}
-                                </div>
-                            </div>
-                        </article>
-                    `
-                )
-                .join("");
-        }
     }
 
     const memberCount =
@@ -460,30 +421,28 @@ function renderMembers() {
 }
 
 function showMemberError() {
+    const message = `
+        <div class="member-loading">
+            Unable to load guild members.
+        </div>
+    `;
+
     const heroMemberList =
         document.getElementById("heroMemberList");
-
-    if (heroMemberList) {
-        heroMemberList.innerHTML = `
-            <div class="member-loading">
-                Unable to load guild members.
-            </div>
-        `;
-    }
 
     const memberList =
         document.getElementById("memberList");
 
-    if (memberList) {
-        memberList.innerHTML = `
-            <div class="member-loading">
-                Unable to load guild members.
-            </div>
-        `;
-    }
-
     const memberCount =
         document.getElementById("memberCount");
+
+    if (heroMemberList) {
+        heroMemberList.innerHTML = message;
+    }
+
+    if (memberList) {
+        memberList.innerHTML = message;
+    }
 
     if (memberCount) {
         memberCount.textContent = "0";
