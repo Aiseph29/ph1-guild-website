@@ -26,7 +26,7 @@ async function loadMembers() {
 
         members = parseMemberCSV(csv);
 
-        console.log(`Loaded ${members.length} guild members.`);
+        console.log(`Loaded ${members.length} unique guild members.`);
 
         renderMembers();
     } catch (error) {
@@ -105,7 +105,7 @@ function parseMemberCSV(csv) {
         return [];
     }
 
-    return rows
+    const parsedMembers = rows
         .slice(headerRowIndex + 1)
         .map(row => ({
             name: row[ignIndex]?.trim() || "",
@@ -117,6 +117,25 @@ function parseMemberCSV(csv) {
             if (member.name.toUpperCase() === "TOTAL") return false;
             return true;
         });
+
+    // Remove duplicate member names.
+    // Comparison is case-insensitive and ignores extra spaces,
+    // so "Noxen", "noxen", and " Noxen " count as one member.
+    const seenNames = new Set();
+
+    return parsedMembers.filter(member => {
+        const normalizedName = member.name
+            .trim()
+            .replace(/\s+/g, " ")
+            .toLowerCase();
+
+        if (seenNames.has(normalizedName)) {
+            return false;
+        }
+
+        seenNames.add(normalizedName);
+        return true;
+    });
 }
 
 function renderMembers() {
@@ -234,7 +253,7 @@ async function loadAttendance() {
 
         attendance = parseAttendanceCSV(csv);
 
-        console.log(`Loaded ${attendance.length} attendance records.`);
+        console.log(`Loaded ${attendance.length} unique attendance members (latest submission per IGN).`);
 
         renderAttendance();
     } catch (error) {
@@ -329,7 +348,7 @@ function parseAttendanceCSV(csv) {
         return [];
     }
 
-    return rows
+    const parsedAttendance = rows
         .slice(headerRowIndex + 1)
         .map(row => ({
             timestamp: row[timestampIndex]?.trim() || "",
@@ -340,6 +359,33 @@ function parseAttendanceCSV(csv) {
             icon: "⚔️"
         }))
         .filter(record => record.name);
+
+    // Keep only the latest attendance submission for each IGN.
+    // This makes the attendance table show each member only once,
+    // using that member's most recent submission regardless of date.
+    const latestByMember = new Map();
+
+    const normalizeName = value =>
+        String(value ?? "")
+            .trim()
+            .replace(/\\s+/g, " ")
+            .toLowerCase();
+
+    const getTimestamp = value => {
+        const parsed = new Date(value);
+        return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+    };
+
+    parsedAttendance.forEach(record => {
+        const key = normalizeName(record.name);
+        const existing = latestByMember.get(key);
+
+        if (!existing || getTimestamp(record.timestamp) >= getTimestamp(existing.timestamp)) {
+            latestByMember.set(key, record);
+        }
+    });
+
+    return Array.from(latestByMember.values());
 }
 
 
