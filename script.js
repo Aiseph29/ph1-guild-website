@@ -450,6 +450,213 @@ function renderAttendance() {
             </tr>
         `)
         .join("");
+
+        renderRankings();
+}
+
+function renderRankings(filter = "all") {
+    const rankingList =
+        document.getElementById("rankingList");
+
+    const rankingFilters =
+        document.getElementById("rankingFilters");
+
+    if (!rankingList) return;
+
+    if (!attendance.length) {
+        rankingList.innerHTML = `
+            <div class="ranking-empty">
+                No ranking data available.
+            </div>
+        `;
+
+        return;
+    }
+
+    const validRecords = attendance
+        .filter(record => {
+            return (
+                record.name &&
+                record.className &&
+                parseGearRating(record.gear) > 0
+            );
+        });
+
+
+    const classes = [
+        ...new Set(
+            validRecords.map(record =>
+                record.className.trim()
+            )
+        )
+    ].sort();
+
+
+    if (rankingFilters) {
+
+        rankingFilters.innerHTML = `
+            <button
+                class="ranking-filter ${filter === "all" ? "active" : ""}"
+                data-class="all"
+            >
+                ALL
+            </button>
+
+            ${classes.map(className => `
+                <button
+                    class="ranking-filter ${
+                        filter === className
+                            ? "active"
+                            : ""
+                    }"
+                    data-class="${esc(className)}"
+                >
+                    ${esc(className)}
+                </button>
+            `).join("")}
+        `;
+
+
+        rankingFilters
+            .querySelectorAll(".ranking-filter")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        renderRankings(
+                            button.dataset.class
+                        );
+
+                    }
+                );
+
+            });
+    }
+
+
+    let grouped = {};
+
+
+    validRecords.forEach(record => {
+
+        const className =
+            record.className.trim();
+
+        if (!grouped[className]) {
+            grouped[className] = [];
+        }
+
+        grouped[className].push(record);
+
+    });
+
+
+    if (filter !== "all") {
+
+        grouped = {
+            [filter]: grouped[filter] || []
+        };
+
+    }
+
+
+    const classEntries =
+        Object.entries(grouped)
+            .filter(
+                ([, players]) =>
+                    players.length > 0
+            )
+            .sort(
+                ([a], [b]) =>
+                    a.localeCompare(b)
+            );
+
+
+    if (!classEntries.length) {
+
+        rankingList.innerHTML = `
+            <div class="ranking-empty">
+                No players found for this class.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    rankingList.innerHTML =
+        classEntries.map(
+            ([className, players]) => {
+
+                players.sort(
+                    (a, b) =>
+                        parseGearRating(b.gear) -
+                        parseGearRating(a.gear)
+                );
+
+
+                return `
+                    <article class="ranking-card">
+
+                        <div class="ranking-card-header">
+
+                            <h3>
+                                ${esc(className)}
+                            </h3>
+
+                            <span>
+                                ${players.length}
+                                ${players.length === 1
+                                    ? "Player"
+                                    : "Players"}
+                            </span>
+
+                        </div>
+
+
+                        <div class="ranking-players">
+
+                            ${players.map(
+                                (player, index) => `
+
+                                <div class="ranking-row">
+
+                                    <div class="ranking-position">
+                                        #${index + 1}
+                                    </div>
+
+
+                                    <div class="ranking-player">
+
+                                        <strong>
+                                            ${esc(player.name)}
+                                        </strong>
+
+                                        <small>
+                                            Latest submission:
+                                            ${esc(player.date || "—")}
+                                        </small>
+
+                                    </div>
+
+
+                                    <div class="ranking-gear">
+                                        ${esc(player.gear)}
+                                    </div>
+
+                                </div>
+
+                            `
+                            ).join("")}
+
+                        </div>
+
+                    </article>
+                `;
+            }
+        ).join("");
 }
 
 function showAttendanceError() {
@@ -870,6 +1077,8 @@ function saveNotes() {
         }, 1800);
     }
 }
+
+
 
 loadDiscordAnnouncements();
 loadMembers();
